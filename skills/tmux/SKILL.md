@@ -52,9 +52,9 @@ This must ALWAYS be printed right after a session was started and once again at 
 
 ## Sending input safely
 
-- Prefer literal sends to avoid shell splitting: `tmux -L agent.sock send-keys -t target -l -- "$cmd"`
-- When composing inline commands, use single quotes or ANSI C quoting to avoid expansion: `tmux ... send-keys -t target -- $'python3 -m http.server 8000'`.
-- To send control keys: `tmux ... send-keys -t target C-c`, `C-d`, `C-z`, `Escape`, etc.
+- Prefer literal sends to avoid shell splitting: `tmux -L agent.sock send-keys -t target -l -- "$cmd"`. In case you need to append control keys afterwards - combine commands via `&&`: `tmux -L agent.sock send-keys -t target -l -- "$cmd" && tmux -L agent.sock send-keys -t target Enter`.
+- When composing inline commands, use single quotes or ANSI C quoting to avoid expansion: `tmux -L agent.sock send-keys -t target -- $'python3 -m http.server 8000'`.
+- To send control keys: `tmux -L agent.sock send-keys -t target C-c`, `C-d`, `C-z`, `Escape`, etc.
 
 ## Watching output
 
@@ -80,8 +80,8 @@ Some special rules for processes:
 
 ## Interactive tool recipes
 
-- **Python REPL**: `tmux ... send-keys -- 'python3 -q' Enter`; wait for `^>>>`; send code with `-l`; interrupt with `C-c`. Always with `PYTHON_BASIC_REPL`.
-- **gdb**: `tmux ... send-keys -- 'gdb --quiet ./a.out' Enter`; disable paging `tmux ... send-keys -- 'set pagination off' Enter`; break with `C-c`; issue `bt`, `info locals`, etc.; exit via `quit` then confirm `y`.
+- **Python REPL**: `tmux -L agent.sock send-keys -- 'python3 -q' Enter`; wait for `^>>>`; send code with `-l`; interrupt with `C-c`. Always with `PYTHON_BASIC_REPL`.
+- **gdb**: `tmux -L agent.sock send-keys -- 'gdb --quiet ./a.out' Enter`; disable paging `tmux -L agent.sock send-keys -- 'set pagination off' Enter`; break with `C-c`; issue `bt`, `info locals`, etc.; exit via `quit` then confirm `y`.
 - **Other TTY apps** (ipdb, psql, mysql, node, bash, ssh): same pattern—start the program, poll for its prompt, then send literal text and Enter.
 
 ## Cleanup
