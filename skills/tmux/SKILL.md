@@ -82,7 +82,8 @@ Some special rules for processes:
 
 - **Python REPL**: `tmux -L agent.sock send-keys -- 'python3 -q' Enter`; wait for `^>>>`; send code with `-l`; interrupt with `C-c`. Always with `PYTHON_BASIC_REPL`.
 - **gdb**: `tmux -L agent.sock send-keys -- 'gdb --quiet ./a.out' Enter`; disable paging `tmux -L agent.sock send-keys -- 'set pagination off' Enter`; break with `C-c`; issue `bt`, `info locals`, etc.; exit via `quit` then confirm `y`.
-- **Other TTY apps** (ipdb, psql, mysql, node, bash, ssh): same pattern—start the program, poll for its prompt, then send literal text and Enter.
+- **ssh-like apps** (ssh, kubectl exec, akeyless ssh): you can add `clear; ` to the command to clear the terminal before executing the next command, so when you use capture-pane - you won't re-read previous outputs again: `tmux -L agent.sock send-keys -l -- 'clear; ls -al`.
+- **Other TTY apps** (ipdb, psql, mysql, node, bash, ssh): same pattern - start the program, poll for its prompt, then send literal text and Enter.
 
 ## Cleanup
 
