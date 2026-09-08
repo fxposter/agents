@@ -14,6 +14,7 @@ Options:
   -T, --timeout   seconds to wait (integer, default: 15)
   -i, --interval  poll interval in seconds (default: 0.5)
   -l, --lines     number of history lines to inspect (integer, default: 1000)
+  -L, --socket    tmux socket name (default: agent.sock, same as the skill uses)
   -h, --help      show this help
 USAGE
 }
@@ -24,6 +25,7 @@ grep_flag="-E"
 timeout=15
 interval=0.5
 lines=1000
+socket="agent.sock"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -33,6 +35,7 @@ while [[ $# -gt 0 ]]; do
     -T|--timeout)  timeout="${2-}"; shift 2 ;;
     -i|--interval) interval="${2-}"; shift 2 ;;
     -l|--lines)    lines="${2-}"; shift 2 ;;
+    -L|--socket)   socket="${2-}"; shift 2 ;;
     -h|--help)     usage; exit 0 ;;
     *) echo "Unknown option: $1" >&2; usage; exit 1 ;;
   esac
@@ -65,7 +68,7 @@ deadline=$((start_epoch + timeout))
 
 while true; do
   # -J joins wrapped lines, -S uses negative index to read last N lines
-  pane_text="$(tmux capture-pane -p -J -t "$target" -S "-${lines}" 2>/dev/null || true)"
+  pane_text="$(tmux -L "$socket" capture-pane -p -J -t "$target" -S "-${lines}" 2>/dev/null || true)"
 
   if printf '%s\n' "$pane_text" | grep $grep_flag -- "$pattern" >/dev/null 2>&1; then
     exit 0
